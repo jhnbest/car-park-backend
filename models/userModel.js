@@ -1,8 +1,11 @@
 const bcrypt = require('bcryptjs');
-const { createConnection } = require('../config/db');
+const BaseModel = require('./baseModel');
 const { generateToken } = require('../utils/jwtUtils');
 
-class UserModel {
+/**
+ * 用户业务模型 - 处理用户相关的业务逻辑
+ */
+class UserModel extends BaseModel {
   /**
    * 用户注册
    * @param {string} username - 用户名
@@ -11,43 +14,45 @@ class UserModel {
    * @returns {Promise} 注册结果
    */
   static async register(username, password, role = 'user') {
-    const connection = await createConnection();
-    try {
-      // 检查用户是否已存在
-      const [existingUsers] = await connection.execute(
-        'SELECT id FROM users WHERE username = ?',
-        [username]
-      );
-      
-      if (existingUsers.length > 0) {
-        throw new Error('用户名已存在');
-      }
-
-      // 加密密码
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // 插入新用户
-      const [result] = await connection.execute(
-        'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
-        [username, hashedPassword, role]
-      );
-
-      // 生成令牌
-      const token = generateToken({
-        id: result.insertId,
-        username,
-        role
-      });
-
-      return {
-        id: result.insertId,
-        username,
-        role,
-        token
-      };
-    } finally {
-      await connection.end();
+    // 检查用户是否已存在
+    const existingUsers = await this.findByConditions('users', { username });
+    
+    if (existingUsers && existingUsers.length > 0) {
+      throw new Error('用户名已存在');
     }
+
+    // 加密密码
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 插入新用户
+    await this.insert('users', {
+      username,
+      password: hashedPassword,
+      role
+    });
+
+    // 获取新用户信息
+    const newUser = await this.findByConditions('users', { username });
+
+    if (!newUser || newUser.length === 0) {
+      throw new Error('用户注册失败');
+    }
+
+    const user = newUser[0];
+
+    // 生成令牌
+    const token = generateToken({
+      id: user.id,
+      username: user.username,
+      role: user.role
+    });
+
+    return {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      token
+    };
   }
 
   /**
@@ -57,19 +62,26 @@ class UserModel {
    * @returns {Promise} 登录结果
    */
   static async login(username, password) {
-    const connection = await createConnection();
     try {
       // 查找用户
-      const [users] = await connection.execute(
-        'SELECT * FROM users WHERE username = ?',
-        [username]
-      );
+      const users = await this.findByConditions('users', { username });
       
-      if (users.length === 0) {
+      if (!users || users.length === 0) {
         throw new Error('用户不存在');
       }
 
       const user = users[0];
+
+      // 详细的密码字段检查
+      // console.log('用户对象:', JSON.stringify(user, null, 2));
+      // console.log('密码字段类型:', typeof user.password);
+      // console.log('密码字段是否存在:', 'password' in user);
+      
+      if (!user.password) {
+        console.error('数据库密码字段异常 - 用户ID:', user.id);
+        console.error('用户对象所有属性:', Object.keys(user));
+        throw new Error('用户密码数据异常，请联系管理员');
+      }
 
       // 验证密码
       const isValidPassword = await bcrypt.compare(password, user.password);
@@ -85,33 +97,73 @@ class UserModel {
       });
 
       return {
-        id: user.id,
-        username: user.username,
-        role: user.role,
+        user : {
+          id: user.id,
+          username: user.username,
+          role: user.role,
+        },  
         token
       };
-    } finally {
-      await connection.end();
+    } catch (error) {
+      console.error('登录过程错误:', error.message);
+      throw error;
     }
   }
 
   /**
-   * 根据ID获取用户信息
+   * 获取用户信息（不包含密码）
    * @param {number} id - 用户ID
    * @returns {Promise} 用户信息
    */
-  static async getById(id) {
-    const connection = await createConnection();
-    try {
-      const [users] = await connection.execute(
-        'SELECT id, username, role, created_at FROM users WHERE id = ?',
-        [id]
-      );
-      
-      return users[0] || null;
-    } finally {
-      await connection.end();
+  static async getProfile(id) {
+    const users = await this.query(
+      'SELECT "id", "username", "role", "created_at" FROM "users" WHERE "id" = ?',
+      [id]
+    );
+    
+    return users && users.length > 0 ? users[0] : null;
+  }
+
+  /**
+   * 更新用户信息
+   * @param {number} id - 用户ID
+   * @param {Object} data - 更新数据
+   * @returns {Promise} 更新结果
+   */
+  static async updateProfile(id, data) {
+    // 不允许更新密码字段
+    if (data.password) {
+      delete data.password;
     }
+    
+    return this.update('users', id, data);
+  }
+
+  /**
+   * 更改密码
+   * @param {number} id - 用户ID
+   * @param {string} oldPassword - 旧密码
+   * @param {string} newPassword - 新密码
+   * @returns {Promise} 更改结果
+   */
+  static async changePassword(id, oldPassword, newPassword) {
+    // 获取用户信息
+    const user = await this.getById('users', id);
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+
+    // 验证旧密码
+    const isValidPassword = await bcrypt.compare(oldPassword, user.password);
+    if (!isValidPassword) {
+      throw new Error('旧密码错误');
+    }
+
+    // 加密新密码
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // 更新密码
+    return this.update('users', id, { password: hashedPassword });
   }
 }
 

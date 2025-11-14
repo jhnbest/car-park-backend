@@ -1,12 +1,13 @@
-const UserModel = require('../models/userModel');
+const AuthService = require('../services/authService');
 
 class AuthController {
+  static authService = new AuthService();
   /**
    * 用户注册
    */
   static async register(req, res) {
     try {
-      const { username, password, role } = req.body;
+      const { username, password, email, role } = req.body;
       
       if (!username || !password) {
         return res.status(400).json({
@@ -15,7 +16,7 @@ class AuthController {
         });
       }
 
-      const result = await UserModel.register(username, password, role);
+      const result = await AuthController.authService.register(username, password, email, role);
       
       res.status(201).json({
         success: true,
@@ -36,7 +37,14 @@ class AuthController {
   static async login(req, res) {
     try {
       const { username, password } = req.body;
-      
+
+      if (username === undefined || password === undefined) {
+        return res.status(400).json({
+          success: false,
+          message: '请求参数格式错误'
+        });
+      }
+
       if (!username || !password) {
         return res.status(400).json({
           success: false,
@@ -44,7 +52,7 @@ class AuthController {
         });
       }
 
-      const result = await UserModel.login(username, password);
+      const result = await AuthController.authService.login(username, password);
       
       res.json({
         success: true,
@@ -52,6 +60,15 @@ class AuthController {
         message: '登录成功'
       });
     } catch (error) {
+      console.error('登录错误:', error.message);
+      
+      if (error.message.includes('bcrypt')) {
+        return res.status(400).json({
+          success: false,
+          message: '密码处理错误'
+        });
+      }
+      
       res.status(401).json({
         success: false,
         message: error.message
@@ -64,9 +81,9 @@ class AuthController {
    */
   static async getProfile(req, res) {
     try {
-      const user = await UserModel.getById(req.user.id);
+      const result = await AuthController.authService.getUserInfo(req.user.id);
       
-      if (!user) {
+      if (!result.success) {
         return res.status(404).json({
           success: false,
           message: '用户不存在'
@@ -75,7 +92,7 @@ class AuthController {
 
       res.json({
         success: true,
-        data: user
+        data: result.user
       });
     } catch (error) {
       res.status(500).json({

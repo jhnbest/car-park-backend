@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
  * @param {string} expiresIn - 过期时间
  * @returns {string} JWT令牌
  */
-const generateToken = (payload, expiresIn = '7d') => {
+const generateToken = (payload, expiresIn = '1d') => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 };
 
