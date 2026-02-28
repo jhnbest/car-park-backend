@@ -138,9 +138,8 @@ class PersonService {
    */
   async getPersonByName(name) {
     try {
-      const persons = await PersonModel.findByName(name);
+      const persons = await PersonModel.findByNameWithOrg(name);
       
-      // 如果没有找到匹配的人员，正常返回空的人员名单
       if (!persons || persons.length === 0) {
         return {
           success: true,
@@ -167,9 +166,8 @@ class PersonService {
    */
   async getPersonByMfId(mfId) {
     try {
-      const person = await PersonModel.findById(mfId);
+      const person = await PersonModel.findByIdWithOrg(mfId);
       
-      // 如果没有找到匹配的人员，正常返回空结果
       if (!person) {
         return {
           success: true,

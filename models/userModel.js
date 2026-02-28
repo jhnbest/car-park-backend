@@ -4,6 +4,7 @@ const { generateToken } = require('../utils/jwtUtils');
 
 /**
  * 用户业务模型 - 处理用户相关的业务逻辑
+ * 表名：sys_user (原 users)
  */
 class UserModel extends BaseModel {
   /**
@@ -15,8 +16,8 @@ class UserModel extends BaseModel {
    */
   static async register(username, password, role = 'user') {
     // 检查用户是否已存在
-    const existingUsers = await this.findByConditions('users', { username });
-    
+    const existingUsers = await this.findByConditions('sys_user', { username });
+
     if (existingUsers && existingUsers.length > 0) {
       throw new Error('用户名已存在');
     }
@@ -25,14 +26,14 @@ class UserModel extends BaseModel {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 插入新用户
-    await this.insert('users', {
+    await this.insert('sys_user', {
       username,
       password: hashedPassword,
       role
     });
 
     // 获取新用户信息
-    const newUser = await this.findByConditions('users', { username });
+    const newUser = await this.findByConditions('sys_user', { username });
 
     if (!newUser || newUser.length === 0) {
       throw new Error('用户注册失败');
@@ -64,19 +65,14 @@ class UserModel extends BaseModel {
   static async login(username, password) {
     try {
       // 查找用户
-      const users = await this.findByConditions('users', { username });
-      
+      const users = await this.findByConditions('sys_user', { username });
+
       if (!users || users.length === 0) {
         throw new Error('用户不存在');
       }
 
       const user = users[0];
 
-      // 详细的密码字段检查
-      // console.log('用户对象:', JSON.stringify(user, null, 2));
-      // console.log('密码字段类型:', typeof user.password);
-      // console.log('密码字段是否存在:', 'password' in user);
-      
       if (!user.password) {
         console.error('数据库密码字段异常 - 用户ID:', user.id);
         console.error('用户对象所有属性:', Object.keys(user));
@@ -97,11 +93,11 @@ class UserModel extends BaseModel {
       });
 
       return {
-        user : {
+        user: {
           id: user.id,
           username: user.username,
           role: user.role,
-        },  
+        },
         token
       };
     } catch (error) {
@@ -117,10 +113,10 @@ class UserModel extends BaseModel {
    */
   static async getProfile(id) {
     const users = await this.query(
-      'SELECT "id", "username", "role", "created_at" FROM "users" WHERE "id" = ?',
+      'SELECT "id", "username", "role", "created_at" FROM "sys_user" WHERE "id" = ?',
       [id]
     );
-    
+
     return users && users.length > 0 ? users[0] : null;
   }
 
@@ -135,8 +131,8 @@ class UserModel extends BaseModel {
     if (data.password) {
       delete data.password;
     }
-    
-    return this.update('users', id, data);
+
+    return this.update('sys_user', id, data);
   }
 
   /**
@@ -148,7 +144,7 @@ class UserModel extends BaseModel {
    */
   static async changePassword(id, oldPassword, newPassword) {
     // 获取用户信息
-    const user = await this.getById('users', id);
+    const user = await this.getById('sys_user', id);
     if (!user) {
       throw new Error('用户不存在');
     }
@@ -163,7 +159,7 @@ class UserModel extends BaseModel {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // 更新密码
-    return this.update('users', id, { password: hashedPassword });
+    return this.update('sys_user', id, { password: hashedPassword });
   }
 }
 

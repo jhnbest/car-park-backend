@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const SchedulerService = require('./services/schedulerService');
+const SyncSchedulerService = require('./services/syncSchedulerService');
 const app = express();
 
 // 基础中间件
@@ -32,8 +33,15 @@ app.use((err, req, res, next) => {
 
 // 应用启动时自动启动定时任务（可选）
 const schedulerService = new SchedulerService();
+const syncSchedulerService = new SyncSchedulerService();
+
 if (process.env.AUTO_START_SCHEDULER === 'true') {
   schedulerService.startAllTasks();
+}
+
+// 启动服务治理中心数据同步定时任务（默认启用）
+if (process.env.ENABLE_GATEWAY_SYNC === 'true') {
+  syncSchedulerService.startAllTasks();
 }
 
 // 启动服务器

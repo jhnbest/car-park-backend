@@ -56,7 +56,6 @@ class AuthService {
    */
   async login(username, password) {
     try {
-      // 直接调用UserModel的login方法，它已经包含了完整的验证逻辑
       const result = await UserModel.login(username, password);
       
       if (!result || !result.user) {
@@ -76,7 +75,10 @@ class AuthService {
       };
     } catch (error) {
       console.error('用户登录失败:', error.message);
-      throw error;
+      if (error.message === '用户不存在' || error.message === '密码错误') {
+        throw error;
+      }
+      throw new Error('用户名或密码错误');
     }
   }
 
