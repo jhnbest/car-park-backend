@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:tns="http://cldz.xiamenair.com.cn/bpm"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  name="BpmBusinessSystemService"
+  targetNamespace="http://cldz.xiamenair.com.cn/bpm">
+
+  <types>
+    <xsd:schema targetNamespace="http://cldz.xiamenair.com.cn/bpm">
+      <xsd:element name="getTemplateFormListRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sysId" type="xsd:string"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getTemplateFormListResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="getFormFieldListRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sysId" type="xsd:string"/>
+            <xsd:element name="modelId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="templateFormId" type="xsd:string"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getFormFieldListResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="getFormFieldValueListRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sysId" type="xsd:string"/>
+            <xsd:element name="modelId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="templateFormId" type="xsd:string"/>
+            <xsd:element name="formInstanceId" type="xsd:string"/>
+            <xsd:element name="fieldIds" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getFormFieldValueListResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="getMethodInfoRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sysId" type="xsd:string"/>
+            <xsd:element name="modelId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="templateFormId" type="xsd:string"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getMethodInfoResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="doMethodProcessRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="formId" type="xsd:string"/>
+            <xsd:element name="functionId" type="xsd:string"/>
+            <xsd:element name="processData" type="xsd:string"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="doMethodProcessResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="getBusinessOrgRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sysId" type="xsd:string"/>
+            <xsd:element name="modelId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="templateFormId" type="xsd:string"/>
+            <xsd:element name="formInstanceId" type="xsd:string"/>
+            <xsd:element name="nodeId" type="xsd:string"/>
+            <xsd:element name="nodeName" type="xsd:string"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="getBusinessOrgResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="synchronizeTemplateRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="sysId" type="xsd:string"/>
+            <xsd:element name="flowDefinitionId" type="xsd:string"/>
+            <xsd:element name="flowTemplateId" type="xsd:string"/>
+            <xsd:element name="operationType" type="xsd:string"/>
+            <xsd:element name="language" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="synchronizeTemplateResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="result" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+
+  <!-- getTemplateFormList -->
+  <message name="getTemplateFormListInput">
+    <part name="parameters" element="tns:getTemplateFormListRequest"/>
+  </message>
+  <message name="getTemplateFormListOutput">
+    <part name="parameters" element="tns:getTemplateFormListResponse"/>
+  </message>
+
+  <!-- getFormFieldList -->
+  <message name="getFormFieldListInput">
+    <part name="parameters" element="tns:getFormFieldListRequest"/>
+  </message>
+  <message name="getFormFieldListOutput">
+    <part name="parameters" element="tns:getFormFieldListResponse"/>
+  </message>
+
+  <!-- getFormFieldValueList -->
+  <message name="getFormFieldValueListInput">
+    <part name="parameters" element="tns:getFormFieldValueListRequest"/>
+  </message>
+  <message name="getFormFieldValueListOutput">
+    <part name="parameters" element="tns:getFormFieldValueListResponse"/>
+  </message>
+
+  <!-- getMethodInfo -->
+  <message name="getMethodInfoInput">
+    <part name="parameters" element="tns:getMethodInfoRequest"/>
+  </message>
+  <message name="getMethodInfoOutput">
+    <part name="parameters" element="tns:getMethodInfoResponse"/>
+  </message>
+
+  <!-- doMethodProcess -->
+  <message name="doMethodProcessInput">
+    <part name="parameters" element="tns:doMethodProcessRequest"/>
+  </message>
+  <message name="doMethodProcessOutput">
+    <part name="parameters" element="tns:doMethodProcessResponse"/>
+  </message>
+
+  <!-- getBusinessOrg -->
+  <message name="getBusinessOrgInput">
+    <part name="parameters" element="tns:getBusinessOrgRequest"/>
+  </message>
+  <message name="getBusinessOrgOutput">
+    <part name="parameters" element="tns:getBusinessOrgResponse"/>
+  </message>
+
+  <!-- synchronizeTemplate -->
+  <message name="synchronizeTemplateInput">
+    <part name="parameters" element="tns:synchronizeTemplateRequest"/>
+  </message>
+  <message name="synchronizeTemplateOutput">
+    <part name="parameters" element="tns:synchronizeTemplateResponse"/>
+  </message>
+
+  <portType name="BpmBusinessSystemServicePortType">
+    <operation name="getTemplateFormList">
+      <input message="tns:getTemplateFormListInput"/>
+      <output message="tns:getTemplateFormListOutput"/>
+    </operation>
+    <operation name="getFormFieldList">
+      <input message="tns:getFormFieldListInput"/>
+      <output message="tns:getFormFieldListOutput"/>
+    </operation>
+    <operation name="getFormFieldValueList">
+      <input message="tns:getFormFieldValueListInput"/>
+      <output message="tns:getFormFieldValueListOutput"/>
+    </operation>
+    <operation name="getMethodInfo">
+      <input message="tns:getMethodInfoInput"/>
+      <output message="tns:getMethodInfoOutput"/>
+    </operation>
+    <operation name="doMethodProcess">
+      <input message="tns:doMethodProcessInput"/>
+      <output message="tns:doMethodProcessOutput"/>
+    </operation>
+    <operation name="getBusinessOrg">
+      <input message="tns:getBusinessOrgInput"/>
+      <output message="tns:getBusinessOrgOutput"/>
+    </operation>
+    <operation name="synchronizeTemplate">
+      <input message="tns:synchronizeTemplateInput"/>
+      <output message="tns:synchronizeTemplateOutput"/>
+    </operation>
+  </portType>
+
+  <binding name="BpmBusinessSystemServiceBinding" type="tns:BpmBusinessSystemServicePortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="getTemplateFormList">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/getTemplateFormList"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="getFormFieldList">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/getFormFieldList"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="getFormFieldValueList">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/getFormFieldValueList"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="getMethodInfo">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/getMethodInfo"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="doMethodProcess">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/doMethodProcess"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="getBusinessOrg">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/getBusinessOrg"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="synchronizeTemplate">
+      <soap:operation soapAction="http://cldz.xiamenair.com.cn/bpm/synchronizeTemplate"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+  </binding>
+
+  <service name="BpmBusinessSystemService">
+    <port name="BpmBusinessSystemServicePort" binding="tns:BpmBusinessSystemServiceBinding">
+      <soap:address location="http://cldz.xiamenair.com.cn/bpm/soap"/>
+    </port>
+  </service>
+</definitions>

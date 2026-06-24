@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "timeout": 15000,
+  "parks": {
+    "park-1": {
+      "baseURL": "http://11.24.47.32:9071",
+      "userName": "9999",
+      "password": "723338a803ca11f0b659525400caaf2e",
+      "parkName": "花屿路生产基地",
+      "area": "厦门区域",
+      "timeout": 15000,
+      "apiVersion": "3.x",
+      "packages": [
+        { "name": "VIP地面", "code": 62 },
+        { "name": "VIP地面地库", "code": 66 },
+        { "name": "产权车", "code": 65 }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    "park-2": {
+      "baseURL": "http://11.24.46.37:8091/api",
+      "userName": "0008",
+      "password": "CEshi@123",
+      "parkName": "高崎生产基地",
+      "area": "厦门区域",
+      "timeout": 15000,
+      "apiVersion": "2.x",
+      "packages": [
+        { "name": "固定车", "code": 65 },
+        { "name": "VIP", "code": 67 },
+        { "name": "夜间限时通行", "code": 62 },
+        { "name": "报备车（可抬杆）", "code": 66 },
+        { "name": "报备车（不抬杆）", "code": 50 },
+        { "name": "内部员工车辆", "code": 60 }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  }
+}

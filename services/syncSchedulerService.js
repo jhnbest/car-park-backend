@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const OrganizationSyncService = require('./gatewayOrganizationSyncService');
 const PersonSyncService = require('./gatewayPersonSyncService');
+const ParkCacheService = require('./parkCacheService');
 const { Logger } = require('./syncLogger');
 
 /**
@@ -12,6 +13,7 @@ class SyncSchedulerService {
     this.tasks = new Map();
     this.organizationSyncService = null;
     this.personSyncService = null;
+    this.parkCacheService = null;
   }
 
   /**
@@ -20,6 +22,7 @@ class SyncSchedulerService {
   initialize() {
     this.organizationSyncService = new OrganizationSyncService();
     this.personSyncService = new PersonSyncService();
+    this.parkCacheService = ParkCacheService;
     Logger.info('SyncScheduler', '同步服务初始化完成');
   }
 
@@ -34,6 +37,7 @@ class SyncSchedulerService {
 
     this.addOrganizationSyncTask();
     this.addPersonSyncTask();
+    this.addParkCacheSyncTask();
 
     console.log('========================================');
     console.log('所有定时任务已启动');
@@ -106,6 +110,40 @@ class SyncSchedulerService {
 
     this.tasks.set(taskName, task);
     console.log(`定时任务 [人员数据同步] 已添加 (每日 01:00 执行)`);
+  }
+
+  /**
+   * 添加园区缓存同步定时任务 - 每12小时执行一次（半天）
+   */
+  addParkCacheSyncTask() {
+    const taskName = 'parkCacheSync';
+
+    const taskFunction = async () => {
+      Logger.info('SyncScheduler', '========== 定时任务开始: 园区缓存数据同步 ==========');
+
+      try {
+        const result = await this.parkCacheService.syncAllParks();
+
+        Logger.info('SyncScheduler', `园区缓存数据同步执行完成: ${result.message}`, result);
+
+        return result;
+      } catch (error) {
+        Logger.error('SyncScheduler', `园区缓存数据同步执行失败: ${error.message}`, error);
+        return {
+          success: false,
+          message: `园区缓存数据同步执行失败: ${error.message}`,
+          error: error
+        };
+      }
+    };
+
+    const task = cron.schedule('0 */12 * * *', taskFunction, {
+      scheduled: true,
+      timezone: 'Asia/Shanghai'
+    });
+
+    this.tasks.set(taskName, task);
+    console.log(`定时任务 [园区缓存同步] 已添加 (每12小时执行: 0点, 12点)`);
   }
 
   /**
@@ -190,6 +228,28 @@ class SyncSchedulerService {
     }
 
     return results;
+  }
+
+  /**
+   * 手动触发园区缓存同步
+   * @returns {Promise} 同步结果
+   */
+  async triggerParkCacheSync() {
+    Logger.info('SyncScheduler', '手动触发园区缓存同步');
+    try {
+      if (!this.parkCacheService) {
+        this.initialize();
+      }
+      const result = await this.parkCacheService.syncAllParks();
+      return result;
+    } catch (error) {
+      Logger.error('SyncScheduler', `手动触发园区缓存同步失败: ${error.message}`);
+      return {
+        success: false,
+        message: `手动触发园区缓存同步失败: ${error.message}`,
+        error: error
+      };
+    }
   }
 
   /**

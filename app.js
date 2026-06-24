@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // 导入路由
 const apiRoutes = require('./routes/apiRoutes');
+const BpmSoapServer = require('./services/bpmSoapServer');
 
 // 注册路由
 app.use('/api', apiRoutes);
@@ -45,7 +46,16 @@ if (process.env.ENABLE_GATEWAY_SYNC === 'true') {
 }
 
 // 启动服务器
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 20000;
+const SOAP_PORT = process.env.SOAP_PORT || 20001;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Express server running on port ${PORT}`);
+});
+
+// 启动BPM SOAP服务端（供BPM回调使用）
+BpmSoapServer.start(SOAP_PORT).then(() => {
+  console.log(`BPM SOAP server running on port ${SOAP_PORT}`);
+}).catch(err => {
+  console.error('BPM SOAP服务器启动失败:', err.message);
 });

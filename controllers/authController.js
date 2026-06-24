@@ -1,4 +1,7 @@
 const AuthService = require('../services/authService');
+const AuditLogService = require('../services/auditLogService');
+const IpUtil = require('../utils/ipUtil');
+const DeviceUtil = require('../utils/deviceUtil');
 
 class AuthController {
   static authService = new AuthService();
@@ -53,7 +56,19 @@ class AuthController {
       }
 
       const result = await AuthController.authService.login(username, password);
-      
+
+      const ipAddress = IpUtil.getClientIp(req);
+      const userAgent = req.headers['user-agent'] || '';
+      const deviceInfo = DeviceUtil.formatDeviceInfo(DeviceUtil.parseUserAgent(userAgent));
+
+      await AuditLogService.logLogin(
+        { id: result.user?.id, name: result.user?.name, username },
+        'SUCCESS',
+        ipAddress,
+        deviceInfo,
+        req
+      );
+
       res.json({
         success: true,
         data: result,
@@ -61,14 +76,27 @@ class AuthController {
       });
     } catch (error) {
       console.error('登录错误:', error.message);
-      
+
+      const ipAddress = IpUtil.getClientIp(req);
+      const userAgent = req.headers['user-agent'] || '';
+      const deviceInfo = DeviceUtil.formatDeviceInfo(DeviceUtil.parseUserAgent(userAgent));
+
+      await AuditLogService.logLogin(
+        { username },
+        'FAIL',
+        ipAddress,
+        deviceInfo,
+        req,
+        error.message
+      );
+
       if (error.message.includes('bcrypt')) {
         return res.status(400).json({
           success: false,
           message: '密码处理错误'
         });
       }
-      
+
       res.status(401).json({
         success: false,
         message: error.message

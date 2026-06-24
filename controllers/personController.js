@@ -106,8 +106,6 @@ class PersonController {
       // 1. 首先尝试嵌套参数格式 params[name]
       // 2. 然后尝试直接参数格式 name
       let name = req.query['params[name]'] || req.query.name;
-
-      console.log('最终获取到的姓名参数:', name);
       
       if (!name) {
         return res.status(400).json({
@@ -135,18 +133,12 @@ class PersonController {
    * 根据人员工号获取人员详情
    */
   static async getPersonByMfId(req, res) {
-    console.log('=== 根据工号获取人员详情调试信息 ===');
-    console.log('完整的 req.query:', req.query);
-    console.log('请求方法:', req.method);
-    console.log('请求URL:', req.url);
     
     try {
       // 支持多种参数获取方式
       // 1. 首先尝试嵌套参数格式 params[mfId]
       // 2. 然后尝试直接参数格式 mfId
       let mfId = req.query['params[mfId]'] || req.query.mfId;
-
-      console.log('最终获取到的工号参数:', mfId);
       
       if (!mfId) {
         return res.status(400).json({

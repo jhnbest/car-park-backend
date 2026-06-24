@@ -178,25 +178,24 @@ const http = {
     request('delete', url, null, params, options),
 
   /**
-   * 下载文件
-   * @param {string} url - 下载URL
-   * @param {object} data - 请求数据
-   * @param {string} filename - 下载文件名
-   */
-  download: (url, data = null, filename = 'download') => {
-    return request('post', url, data, null, {
-      responseType: 'blob'
-    }).then(response => {
-      // 创建blob链接并触发下载
-      const blob = new Blob([response]);
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-      window.URL.revokeObjectURL(link.href);
-      return response;
-    });
-  }
+ * 下载文件
+ * @param {string} url - 下载URL
+ * @param {object} data - 请求数据
+ * @param {string} filename - 下载文件名
+ */
+download: (url, data = null, filename = 'download') => {
+  return request('post', url, data, null, {
+    responseType: 'blob'
+  }).then(response => {
+    // 创建blob链接并触发下载
+    const blob = new Blob([response]);
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    window.URL.revokeObjectURL(link.href);
+    return response;
+  });
 };
 
 module.exports = http;

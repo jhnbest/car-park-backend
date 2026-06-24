@@ -56,7 +56,6 @@ class PersonModel extends BaseModel {
       FROM "hr_staff" h
       LEFT JOIN "sys_organization" o ON h."organ_id" = o."organ_id"
       WHERE (h."cn_name" LIKE ? OR h."smpl_name" LIKE ? OR h."full_name" LIKE ?)
-        AND h."emp_type" IN ('在职人员', '协议人员', '外包在职')
       ORDER BY h."cn_name"
     `;
     const result = await this.query(sql, [searchTerm, searchTerm, searchTerm]);
@@ -145,22 +144,22 @@ class PersonModel extends BaseModel {
   }
 
   /**
-   * 获取人员总数
+   * 获取人员总数（仅在职）
    * @returns {Promise} 人员总数
    */
   static async getCount() {
-    const sql = 'SELECT COUNT(*) as "total" FROM "hr_staff"';
+    const sql = 'SELECT COUNT(*) as "total" FROM "hr_staff" WHERE "emp_status_nm_new" = \'在职\'';
     const result = await this.query(sql);
     return result.length > 0 ? result[0].total : 0;
   }
 
   /**
-   * 根据机构ID获取人员数量
+   * 根据机构ID获取人员数量（仅在职）
    * @param {string} organId - 机构ID
    * @returns {Promise} 人员数量
    */
   static async getCountByOrganId(organId) {
-    const sql = 'SELECT COUNT(*) as "total" FROM "hr_staff" WHERE "organ_id" = ?';
+    const sql = 'SELECT COUNT(*) as "total" FROM "hr_staff" WHERE "organ_id" = ? AND "emp_status_nm_new" = \'在职\'';
     const result = await this.query(sql, [organId]);
     return result.length > 0 ? result[0].total : 0;
   }
