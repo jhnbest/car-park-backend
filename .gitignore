@@ -1,3 +1,11 @@
+# 接口文档（敏感业务文档）
+BPM流程引擎对接教程.md
+服务治理中心认证说明.md
+机构数据接口文档.md
+人员数据接口文档.md
+*.pdf
+*.docx
+
 # 依赖
 node_modules/
 package-lock.json
